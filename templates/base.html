@@ -71,7 +71,11 @@
                 <a href="/mineswaper">Mineswaper</a>
             </div>
             <div>
+                {{if .User}}
+                <a href="/login">{{.User.Name}}</a>
+                {{else}}
                 <a href="/login">Login</a>
+                {{end}}
             </div>
         </nav>
     </header>

@@ -10,14 +10,34 @@ import (
 
 var templatesDir = "templates/"
 
-func renderTemplate(w http.ResponseWriter, templateName string, data any) {
+type Page struct {
+    User *User
+    Content any
+}
+
+func renderTemplate(w http.ResponseWriter, r *http.Request, templateName string, data any) {
     t, err := template.ParseFiles(templatesDir + "base.html", templatesDir + templateName)
     if err != nil {
         log.Println(err)
         http.Error(w, err.Error(), http.StatusInternalServerError)
     }
 
-    err = t.Execute(w, data)
+    cookies := r.Cookies()
+    token := ""
+    for _, c := range cookies {
+        if c.Name == "token" {
+            token = c.Value
+            break
+        }
+    }
+    user, _ := AuthUser(token)
+
+    p := Page {
+        User: user,
+        Content: data,
+    }
+
+    err = t.Execute(w, p)
 
     if err != nil {
         log.Println(err)
@@ -27,7 +47,7 @@ func renderTemplate(w http.ResponseWriter, templateName string, data any) {
 
 func handlePosts(w http.ResponseWriter, r *http.Request) {
     if r.Method == http.MethodGet {
-        renderTemplate(w, "posts.html", map[string][]Post{
+        renderTemplate(w, r, "posts.html", map[string][]Post{
             "Posts": getPosts(),
         })
     } else if r.Method == http.MethodDelete {
@@ -55,7 +75,7 @@ func handlePostsAdd(w http.ResponseWriter, r *http.Request) {
         addPost(data["title"][0], data["text"][0])
     }
     
-    renderTemplate(w, "posts_add.html", nil)
+    renderTemplate(w, r, "posts_add.html", nil)
 }
 
 func handlePostsEdit(w http.ResponseWriter, r *http.Request) {
@@ -73,15 +93,15 @@ func handlePostsEdit(w http.ResponseWriter, r *http.Request) {
     }
     
     p := getPost(id)
-    renderTemplate(w, "posts_edit.html", p)
+    renderTemplate(w, r, "posts_edit.html", p)
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-    renderTemplate(w, "index.html", nil)
+    renderTemplate(w, r, "index.html", nil)
 }
 
 func handleMineswaper(w http.ResponseWriter, r *http.Request) {
-    renderTemplate(w, "mineswaper.html", nil)
+    renderTemplate(w, r, "mineswaper.html", nil)
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -96,16 +116,21 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
         username := data["username"][0]
         password := data["password"][0]
 
-        err = loginUser(username, password)
-
+        user, err := loginUser(username, password)
         if err != nil {
-            renderTemplate(w, "login.html", map[string]string{
+            renderTemplate(w, r, "login.html", map[string]string{
                 "Username": username,
                 "Error": fmt.Sprintf("can't login: %v", err),
             })
-            return
+        } else {
+            cookie := http.Cookie{
+                Name: "token",
+                Value: user.Token,
+            }
+            http.SetCookie(w, &cookie)
+            http.Redirect(w, r, "/", http.StatusSeeOther)
         }
+    } else {
+        renderTemplate(w, r, "login.html", nil)
     }
-
-    renderTemplate(w, "login.html", nil)
 }

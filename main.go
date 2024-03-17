@@ -1,21 +1,26 @@
 package main
 
 import (
-    "log"
-    "net/http"
+    "flag"
+    "fmt"
+    "os"
 )
 
 
 func main() {
     initDb()
 
-    http.HandleFunc("/", handleRoot)
-    http.HandleFunc("/posts/add", handlePostsAdd)
-    http.HandleFunc("/posts/edit", handlePostsEdit)
-    http.HandleFunc("/posts", handlePosts)
-    http.HandleFunc("/login", handleLogin)
-    http.HandleFunc("/mineswaper", handleMineswaper)
+    var action string
+    flag.StringVar(&action, "action", "", "what should be runing? 'server' or 'newuser'")
+    flag.Parse()
 
-    log.Println("started")
-    panic(http.ListenAndServe(":8000", nil))
+    switch action {
+        case "server":
+            runServer()
+        case "newuser":
+            runAddNewUser()
+        default:
+            fmt.Printf("unknown action: %s\n", action)
+            os.Exit(1)
+    }
 }

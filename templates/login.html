@@ -3,7 +3,7 @@
 <form action="" method="POST">
     <p>
         <label for="username">Username:</label>
-        <input type="text" id="username" name="username" {{if .Username}}value="{{.Username}}"{{end}}>
+        <input type="text" id="username" name="username" {{if .Content}}value="{{.Content.Username}}"{{end}}>
     </p>
 
     <p>
@@ -11,8 +11,8 @@
         <input type="password" id="password" name="password">
     </p>
 
-    {{if .Error}}
-    <p class="red">{{.Error}}</p>
+    {{if .Content}}
+    <p class="red">{{.Content.Error}}</p>
     {{end}}
 
     <p>

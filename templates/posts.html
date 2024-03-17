@@ -1,6 +1,6 @@
 {{define "title"}}Posts{{end}}
 {{define "content"}}
-{{ range .Posts}}
+{{ range .Content.Posts}}
 <div class="item">
     <h1>{{.Id}}: {{.Title}}</h1>
     <p>{{.Text}}</p>

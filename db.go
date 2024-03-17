@@ -7,19 +7,6 @@ import (
 
 var db *sql.DB = nil
 
-func runSql(q string) error {
-    statement, err := db.Prepare(q)
-    if err != nil {
-        return err
-    }
-    _, err = statement.Exec()
-    if err != nil {
-        return err
-    }
-
-    return nil
-}
-
 func initDb() *sql.DB {
     var err error
     db, err = sql.Open("sqlite3", "./db.sqlite3")
@@ -27,12 +14,12 @@ func initDb() *sql.DB {
         panic(err)
     }
 
-    err = runSql("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, text TEXT)")
+    _, err = db.Exec("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, text TEXT)")
     if err != nil {
         panic(err)
     }
 
-    err = runSql("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password_hash TEXT, is_admin BOOLEAN)")
+    _, err = db.Exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT UNIQUE, password_hash TEXT, token TEXT, is_admin BOOLEAN)")
     if err != nil {
         panic(err)
     }
