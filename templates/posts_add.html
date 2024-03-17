@@ -1,0 +1,19 @@
+{{define "title"}}New post{{end}}
+{{define "content"}}
+<p>Every one can post anything, but can't edit it or delete</p>
+<form action="" method="POST">
+    <p>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title">
+    </p>
+
+    <p>
+        <label for="text">Text:</label>
+        <textarea type="text" id="text" name="text"></textarea>
+    </p>
+
+    <p>
+        <input type="submit" value="Submit">
+    </p>
+</form>
+{{end}}

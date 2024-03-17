@@ -1,0 +1,92 @@
+<head>
+    <title>{{template "title" .}}</title>
+</head>
+<style>
+    body {
+        background-color: #000;
+        color: #aaa;
+        max-width: min(100vh, 100vw);
+        margin: 10 auto;
+        font-family: monospace;
+        font-size: 16pt;
+    }
+
+    a, b, i, h1 {
+        color: #fff;
+    }
+
+    input, textarea {
+        outline: none;
+        color: #aaa;
+        border: none;
+        background-color: #222;
+        font-size: 16pt;
+        font-family: monospace;
+    }
+
+    input[type="submit"] {
+        background-color: #050;
+        cursor: pointer;
+        padding: 0 16pt;
+    }
+
+    label {
+        width: 30%;
+    }
+
+    .content {
+        margin-top: 100pt;
+    }
+
+    .item {
+        margin-top: 50pt;
+    }
+
+    .red {
+        color: #a00;
+    }
+    .red-bg {
+        background-color: #500;
+    }
+
+    .green {
+        color: #0a0;
+    }
+    .green-bg {
+        background-color: #050;
+    }
+    nav {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+<body>
+    <header>
+        <h1>{{template "title" .}}</h1>
+        <nav>
+            <div>
+                <a href="/">Main</a>
+                <a href="/posts">Posts</a>
+                <a href="/posts/add">Add post</a>
+                <a href="/mineswaper">Mineswaper</a>
+            </div>
+            <div>
+                <a href="/login">Login</a>
+            </div>
+        </nav>
+    </header>
+    
+    <section class="content">
+    {{template "content" .}}
+    </section>
+</body>
+<script>
+    document.querySelectorAll("a[method]").forEach(a => {
+        a.addEventListener("click", (e) => {
+            e.preventDefault()
+            fetch(a.getAttribute('href'), {method: a.getAttribute('method')}).then(r => {
+                document.location = a.getAttribute('href')
+            })
+        })
+    })
+</script>

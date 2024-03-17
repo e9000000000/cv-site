@@ -1,0 +1,11 @@
+{{define "title"}}Posts{{end}}
+{{define "content"}}
+{{ range .Posts}}
+<div class="item">
+    <h1>{{.Id}}: {{.Title}}</h1>
+    <p>{{.Text}}</p>
+    <a class="red" method="DELETE" href="/posts?id={{.Id}}">Delete</a>
+    <a class="green" href="/posts/edit?id={{.Id}}">Edit</a>
+</div>
+{{end}}
+{{end}}

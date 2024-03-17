@@ -1,0 +1,22 @@
+{{define "title"}}Log-in{{end}}
+{{define "content"}}
+<form action="" method="POST">
+    <p>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" {{if .Username}}value="{{.Username}}"{{end}}>
+    </p>
+
+    <p>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+    </p>
+
+    {{if .Error}}
+    <p class="red">{{.Error}}</p>
+    {{end}}
+
+    <p>
+        <input type="submit" value="Log-in">
+    </p>
+</form>
+{{end}}

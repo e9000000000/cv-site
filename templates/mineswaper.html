@@ -1,0 +1,184 @@
+{{define "title"}}Mineswaper{{end}}
+{{define "content"}}
+<div class="field" id="field"></div>
+<script>
+const SIZE = 10
+const BOMBS = 10
+
+const field = document.getElementById('field')
+
+let bombs = []
+let revealed = []
+let flaged = []
+let isAlive = true
+
+function randInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+function revealCell(x, y) {
+    x = parseInt(x)
+    y = parseInt(y)
+
+    if (!isAlive) {
+        return
+    }
+
+    if (revealed.findIndex(cell => cell.x == x && cell.y == y) != -1) {
+        return
+    }
+    revealed.push({x: x, y: y})
+
+    const cell = document.getElementById(`cell-${x}-${y}`)
+    cell.classList.add('revealed')
+
+    if (bombs.findIndex(cell => cell.x == x && cell.y == y) != -1) {
+        cell.innerText = 'X'
+        cell.classList.add('red')
+        isAlive = false
+        setTimeout(() => {
+            alert('bang')
+        }, 250)
+        return
+    } else {
+        cell.classList.remove('red')
+        let bombsAround = 0
+        for (let by=y-1; by<=y+1; by++) {
+            for (let bx=x-1; bx<=x+1; bx++) {
+                if (bx < 0 || by < 0 || bx >= SIZE || by >= SIZE || (bx == x && by == y)) {
+                    continue
+                }
+
+                if (bombs.findIndex(cell => cell.x == bx && cell.y == by) != -1) {
+                    bombsAround += 1
+                }
+            }
+        }
+
+        if (bombsAround > 0) {
+            cell.innerText = bombsAround
+        } else {
+            cell.innerText = ''
+            for (let by=y-1; by<=y+1; by++) {
+                for (let bx=x-1; bx<=x+1; bx++) {
+                    if (bx < 0 || by < 0 || bx >= SIZE || by >= SIZE || (bx == x && by == y)) {
+                        continue
+                    }
+                    
+                    revealCell(bx, by)
+                }
+            }
+
+        }
+    }
+
+    checkWin()
+}
+
+function toggleFlag(x, y) {
+    x = parseInt(x)
+    y = parseInt(y)
+
+    if (!isAlive) {
+        return
+    }
+
+    if (revealed.findIndex(cell => cell.x == x && cell.y == y) != -1) {
+        return
+    }
+
+    const cell = document.getElementById(`cell-${x}-${y}`)
+
+    const index = flaged.findIndex(cell => cell.x == x && cell.y == y)
+    if (index == -1) {
+        flaged.push({x: x, y: y})
+        cell.innerText = 'F'
+        cell.classList.add('red')
+    } else {
+        flaged.pop(index)
+        cell.innerText = ''
+        cell.classList.remove('red')
+    }
+
+    checkWin()
+}
+
+function checkWin() {
+    if (flaged.length != bombs.length) {
+        return
+    }
+
+    for (let y=0; y<SIZE; y++) {
+        for (let x=0; x<SIZE; x++) {
+            if (flaged.findIndex(cell => cell.x == x && cell.y == y) == -1 && revealed.findIndex(cell => cell.x == x && cell.y == y) == -1) {
+                return
+            }
+        }
+    }
+    
+    document.querySelectorAll('.cell').forEach(e => e.classList.add('win'))
+    isAlive = false
+}
+
+for (let y=0; y<SIZE; y++) {
+    const row = document.createElement('div')
+    row.classList.add('row')
+    field.appendChild(row)
+
+    for (let x=0; x<SIZE; x++) {
+        const cell = document.createElement('div')
+        cell.classList.add('cell')
+        cell.setAttribute('id', `cell-${x}-${y}`)
+        cell.dataset.x = x
+        cell.dataset.y = y
+        row.appendChild(cell)
+
+        cell.addEventListener('click', (e) => {
+            revealCell(e.target.dataset.x, e.target.dataset.y)
+        })
+        cell.addEventListener('contextmenu', (e) => {
+            e.preventDefault()
+            toggleFlag(e.target.dataset.x, e.target.dataset.y)
+        })
+    }
+
+    while (bombs.length < BOMBS) {
+        const x = randInt(SIZE)
+        const y = randInt(SIZE)
+
+        const existsIndex = bombs.findIndex(cell => cell.x == x && cell.y == y)
+        if (existsIndex != -1) {
+            continue
+        }
+
+        bombs.push({x: x, y: y})
+    }
+}
+
+</script>
+<style>
+.field {
+    margin: 0 auto;
+    width: fit-content;
+}
+.cell {
+    cursor: pointer;
+    width: 66px;
+    height: 66px;
+    border: 1px solid #666;
+    border-radius: 10%;
+    font-size: 33pt;
+    text-align: center;
+    margin: 2px;
+}
+.row {
+    display: flex;
+}
+.revealed {
+    border-color: #fff;
+}
+.win {
+    border-color: #0a0;
+}
+</style>
+{{end}}
