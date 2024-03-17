@@ -48,15 +48,14 @@ func (u *User) Save() error {
 // Token should be assigned before call
 func (u *User) LoadByToken() error {
     rows, err := db.Query("SELECT id, username, password_hash, is_admin FROM users WHERE token=?", u.Token)
+    defer rows.Close()
     if err != nil {
         return err
     }
 
     if rows.Next() {
         rows.Scan(&u.Id, &u.Name, &u.PwHash, &u.IsAdmin)
-        rows.Close()
     } else {
-        rows.Close()
         return fmt.Errorf("can't find user by token: %s", u.Token)
     }
 
@@ -66,15 +65,14 @@ func (u *User) LoadByToken() error {
 // Id should be assigned before call
 func (u *User) LoadById() error {
     rows, err := db.Query("SELECT token, username, password_hash, is_admin FROM users WHERE id=?", u.Id)
+    defer rows.Close()
     if err != nil {
         return err
     }
 
     if rows.Next() {
         rows.Scan(&u.Token, &u.Name, &u.PwHash, &u.IsAdmin)
-        rows.Close()
     } else {
-        rows.Close()
         return fmt.Errorf("can't find user by id: %s", u.Id)
     }
 
@@ -99,6 +97,7 @@ func loginUser(username string, password string) (*User, error) {
 
     pwHash := hashString(password)
     rows, err := db.Query("SELECT id FROM users WHERE username=? AND password_hash=?", username, pwHash)
+    defer rows.Close()
     if err != nil {
         return nil, err
     }
@@ -106,11 +105,9 @@ func loginUser(username string, password string) (*User, error) {
     var u User
     if rows.Next() {
         rows.Scan(&u.Id)
-        rows.Close()
         err = u.LoadById()
         return &u, err
     } else {
-        rows.Close()
         return nil, fmt.Errorf("wrong username or password")
     }
 }

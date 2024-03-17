@@ -30,6 +30,7 @@ func getPosts() []Post {
 
 func getPost(id int) *Post {
     rows, err := db.Query("SELECT * FROM posts WHERE id=?", id)
+    defer rows.Close()
     if err != nil {
         panic(err)
     }
@@ -41,7 +42,6 @@ func getPost(id int) *Post {
         log.Printf("can't get post, no post with id %d\n", id)
     }
 
-    rows.Close()
     return &p
 }
 
