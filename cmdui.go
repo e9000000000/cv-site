@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-func readLine(prompt string, r bufio.Reader) string {
+func readLine(prompt string, r *bufio.Reader) string {
 	fmt.Print(prompt)
-	result, err := reader.ReadString('\n')
+	result, err := r.ReadString('\n')
 	if err != nil {
 		panic(err)
 	}
@@ -21,9 +21,9 @@ func runAddNewUser() {
 
 	reader := bufio.NewReader(os.Stdin)
 
-	username := readLine("username: ")
-	password := readLine("password: ")
-	isAdmin := strings.ToLower(readLine("is admin? (t/f): ")) == "t"
+	username := readLine("username: ", reader)
+	password := readLine("password: ", reader)
+	isAdmin := strings.ToLower(readLine("is admin? (t/f): ", reader)) == "t"
 
 	_, err := addNewUser(username, password, isAdmin)
 	if err != nil {
