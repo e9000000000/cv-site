@@ -11,6 +11,7 @@ func runServer() {
 	http.HandleFunc("/posts/edit", handlePostsEdit)
 	http.HandleFunc("/posts", handlePosts)
 	http.HandleFunc("/login", handleLogin)
+	http.HandleFunc("/logout", handleLogout)
 	http.HandleFunc("/mineswaper", handleMineswaper)
 
 	log.Println("server started")

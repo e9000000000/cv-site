@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/gomarkdown/markdown"
+	"github.com/microcosm-cc/bluemonday"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -117,6 +120,17 @@ func handlePostsEdit(w http.ResponseWriter, r *http.Request) {
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
 	p := makeBasePage(r)
+
+	md, err := os.ReadFile("README.md")
+	if err != nil {
+		http.Error(w, "can't read README.md file", http.StatusInternalServerError)
+		return
+	}
+
+	maybeUnsafeHTML := markdown.ToHTML(md, nil, nil)
+	html := bluemonday.UGCPolicy().SanitizeBytes(maybeUnsafeHTML)
+	p.Content = template.HTML(string(html))
+
 	renderTemplate(w, "index.html", p)
 }
 
@@ -157,4 +171,20 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	renderTemplate(w, "login.html", p)
+}
+
+func handleLogout(w http.ResponseWriter, r *http.Request) {
+	p := makeBasePage(r)
+
+	if p.User == nil {
+		http.Error(w, "you are not logined", http.StatusBadRequest)
+		return
+	}
+
+	cookie := http.Cookie{
+		Name:  "token",
+		Value: "",
+	}
+	http.SetCookie(w, &cookie)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

@@ -64,20 +64,19 @@
     <header>
         <h1>{{template "title" .}}</h1>
         <nav>
+			<div>{{if .User}}Hi, {{.User.Name}}{{end}}</div>
             <div>
                 <a href="/">Main</a>
                 <a href="/posts">Posts</a>
+                <a href="/mineswaper">Mineswaper</a>
                 {{if .User}}
                 <a href="/posts/add">Add post</a>
-                {{end}}
-                <a href="/mineswaper">Mineswaper</a>
-            </div>
-            <div>
-                {{if .User}}
-                <a href="/login">{{.User.Name}}</a>
+                <a href="/logout">Logout</a>
                 {{else}}
                 <a href="/login">Login</a>
                 {{end}}
+            </div>
+            <div>
             </div>
         </nav>
     </header>
