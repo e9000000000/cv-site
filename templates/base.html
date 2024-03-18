@@ -15,6 +15,22 @@
         color: #fff;
     }
 
+	code, pre {
+		line-height: 2.5;
+		padding: 5px;
+		border-radius: 5px;
+		color: #ccc;
+		background-color: #222;
+	}
+
+	pre {
+		line-height: unset;
+	}
+
+	pre code {
+		line-height: unset;
+	}
+
     input, textarea {
         outline: none;
         color: #aaa;
@@ -75,8 +91,6 @@
                 {{else}}
                 <a href="/login">Login</a>
                 {{end}}
-            </div>
-            <div>
             </div>
         </nav>
     </header>
