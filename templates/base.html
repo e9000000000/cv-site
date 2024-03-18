@@ -50,7 +50,11 @@
         width: 30%;
     }
 
-    .content {
+	header {
+		margin-bottom: 100pt;
+	}
+
+    footer {
         margin-top: 100pt;
     }
 
@@ -95,9 +99,13 @@
         </nav>
     </header>
     
-    <section class="content">
+    <section>
     {{template "content" .}}
     </section>
+
+	<footer>
+		<a target="_blank" href="https://github.com/e9000000000/cv-site">Source code</a>
+	</footer>
 </body>
 <script>
     document.querySelectorAll("a[method]").forEach(a => {
