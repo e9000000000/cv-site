@@ -7,22 +7,23 @@ import (
     "strings"
 )
 
+func readLine(prompt string, r bufio.Reader) string {
+    fmt.Print(prompt)
+    result, err := reader.ReadString('\n')
+    if err != nil {
+        panic(err)
+    }
+    return strings.Trim(result, " \n")
+}
+
 func runAddNewUser() {
     fmt.Println("add new user ran")
 
     reader := bufio.NewReader(os.Stdin)
 
-    fmt.Print("username: ")
-    username, _ := reader.ReadString('\n')
-    username = strings.Trim(username, " \n")
-
-    fmt.Print("password: ")
-    password, _ := reader.ReadString('\n')
-    password = strings.Trim(password, " \n")
-
-    fmt.Print("is admin? (t/f): ")
-    isAdminString, _ := reader.ReadString('\n')
-    isAdmin := strings.ToLower(strings.Trim(isAdminString, " \n")) == "t"
+    username := readLine("username: ")
+    password := readLine("password: ")
+    isAdmin := strings.ToLower(readLine("is admin? (t/f): ")) == "t"
 
     _, err := addNewUser(username, password, isAdmin)
     if err != nil {
