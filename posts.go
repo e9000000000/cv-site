@@ -2,17 +2,20 @@ package main
 
 import (
     "log"
+    "fmt"
 )
 
 type Post struct {
     Id int
     Title string
     Text string
+    Author *User
 }
 
 
 func getPosts() []Post {
-    rows, err := db.Query("SELECT * FROM posts ORDER BY id DESC")
+    rows, err := db.Query("SELECT id, title, text, author_id FROM posts ORDER BY id DESC")
+    defer rows.Close()
     if err != nil {
         panic(err)
     }
@@ -20,24 +23,37 @@ func getPosts() []Post {
     var posts []Post
     for rows.Next() {
         var p Post
-        rows.Scan(&p.Id, &p.Title, &p.Text)
+        var u User
+        rows.Scan(&p.Id, &p.Title, &p.Text, &u.Id)
+        err = u.LoadById()
+        if err != nil {
+            panic(err)
+        } else {
+            p.Author = &u
+        }
         posts = append(posts, p)
     }
 
-    rows.Close()
     return posts
 }
 
 func getPost(id int) *Post {
-    rows, err := db.Query("SELECT * FROM posts WHERE id=?", id)
+    rows, err := db.Query("SELECT id, title, text, author_id FROM posts WHERE id=?", id)
     defer rows.Close()
     if err != nil {
         panic(err)
     }
 
     var p Post
+    var u User
     if rows.Next() {
-        rows.Scan(&p.Id, &p.Title, &p.Text)
+        rows.Scan(&p.Id, &p.Title, &p.Text, &u.Id)
+        err = u.LoadById()
+        if err != nil {
+            panic(err)
+        } else {
+            p.Author = &u
+        }
     } else {
         log.Printf("can't get post, no post with id %d\n", id)
     }
@@ -45,32 +61,41 @@ func getPost(id int) *Post {
     return &p
 }
 
-func addPost(title string, text string) {
-    q, err := db.Prepare("INSERT INTO posts (title, text) VALUES (?, ?)")
+func addPost(title string, text string, author *User) error {
+    if author == nil {
+        return fmt.Errorf("can't create post without author")
+    }
+
+    _, err := db.Exec("INSERT INTO posts (title, text, author_id) VALUES (?, ?, ?)", title, text, author.Id)
     if err != nil {
         panic(err)
-    } else {
-        q.Exec(title, text)
     }
+
+    return nil
 }
 
-func deletePost(id int) {
-    q, err := db.Prepare("DELETE FROM posts WHERE id=?")
+func deletePost(id int, u *User) error {
+    if u == nil || !u.IsAdmin {
+        return fmt.Errorf("only admin can delete posts")
+    }
+
+    _, err := db.Exec("DELETE FROM posts WHERE id=?", id)
     if err != nil {
         panic(err)
-    } else {
-        q.Exec(id)
     }
+
+    return nil
 }
 
-func editPost(id int, title string, text string) {
-    q, err := db.Prepare("UPDATE posts SET title=?, text=? WHERE id=?")
+func editPost(id int, title string, text string, u *User) error {
+    if u == nil || !u.IsAdmin {
+        return fmt.Errorf("only admin can edit posts")
+    }
+
+    _, err := db.Exec("UPDATE posts SET title=?, text=? WHERE id=?", title, text, id)
     if err != nil {
         panic(err)
-    } else {
-        _, err := q.Exec(title, text, id)
-        if err != nil {
-            panic(err)
-        }
     }
+
+    return nil
 }

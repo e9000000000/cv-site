@@ -1,11 +1,15 @@
 {{define "title"}}Posts{{end}}
 {{define "content"}}
-{{ range .Content.Posts}}
+{{ range .Content}}
 <div class="item">
-    <h1>{{.Id}}: {{.Title}}</h1>
+    <h1>{{.Author.Name}}: {{.Title}}</h1>
     <p>{{.Text}}</p>
+    {{if $.User}}
+    {{if $.User.IsAdmin}}
     <a class="red" method="DELETE" href="/posts?id={{.Id}}">Delete</a>
     <a class="green" href="/posts/edit?id={{.Id}}">Edit</a>
+    {{end}}
+    {{end}}
 </div>
 {{end}}
 {{end}}
