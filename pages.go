@@ -173,6 +173,49 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "login.html", p)
 }
 
+func handleRegister(w http.ResponseWriter, r *http.Request) {
+	p := makeBasePage(r)
+
+	if r.Method == http.MethodPost {
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("can't parse form: %v", err), http.StatusBadRequest)
+			return
+		}
+
+		data := r.PostForm
+		username := data["username"][0]
+		password := data["password"][0]
+		passwordConfirm := data["password-confirm"][0]
+
+		if password != passwordConfirm {
+			p.Content = map[string]string {
+				"Username": username,
+				"Error": "passwords do not match",
+			}
+		} else {
+			user, err := addNewUser(username, password, false)
+
+			if err != nil {
+				p.Content = map[string]string {
+					"Username": username,
+					"Error":    fmt.Sprintf("can't register: %v", err),
+				}
+			} else {
+				cookie := http.Cookie {
+					Name:  "token",
+					Value: user.Token,
+				}
+				http.SetCookie(w, &cookie)
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+				return
+			}
+		}
+	}
+
+	renderTemplate(w, "register.html", p)
+}
+
 func handleLogout(w http.ResponseWriter, r *http.Request) {
 	p := makeBasePage(r)
 

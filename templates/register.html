@@ -1,0 +1,27 @@
+{{define "title"}}Register{{end}}
+{{define "content"}}
+<form action="" method="POST">
+    <p>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" value="{{if .Content}}{{.Content.Username}}{{end}}">
+    </p>
+
+    <p>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+    </p>
+
+    <p>
+        <label for="password-confirm">Password:</label>
+        <input type="password" id="password-confirm" name="password-confirm">
+    </p>
+
+    {{if .Content}}
+    <p class="red">{{.Content.Error}}</p>
+    {{end}}
+
+    <p>
+        <input type="submit" value="Register">
+    </p>
+</form>
+{{end}}
