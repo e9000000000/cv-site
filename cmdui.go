@@ -13,7 +13,7 @@ func readLine(prompt string, r *bufio.Reader) string {
 	if err != nil {
 		panic(err)
 	}
-	return strings.Trim(result, " \n")
+	return strings.Trim(result, " \n\r")
 }
 
 func runAddNewUser() {
